@@ -22,7 +22,6 @@ namespace Api.Controllers
             _tokenServicio = tokenServicio;
         }
 
-        [Authorize]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Usuario>>> GetUsuarios()
         {
@@ -30,7 +29,6 @@ namespace Api.Controllers
             return Ok(usuarios);
         }
 
-        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<Usuario>> GetUsuario(int id)
         {

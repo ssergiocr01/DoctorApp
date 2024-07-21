@@ -1,16 +1,19 @@
-﻿using Data.Interfaces;
-using Data.Servicios;
+﻿using Api.Errores;
 using Data;
-using Microsoft.OpenApi.Models;
-using Microsoft.EntityFrameworkCore;
+using Data.Interfaces;
+using Data.Interfaces.IRepositorio;
+using Data.Repositorios;
+using Data.Servicios;
 using Microsoft.AspNetCore.Mvc;
-using Api.Errores;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
+using Utilidades;
 
 namespace Api.Extensiones
 {
     public static class ServicioAplicacionExtension
     {
-        public static IServiceCollection AgregarServiciosAplicacion(this IServiceCollection services, IConfiguration config) 
+        public static IServiceCollection AgregarServiciosAplicacion(this IServiceCollection services, IConfiguration config)
         {
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen(options =>
@@ -51,6 +54,7 @@ namespace Api.Extensiones
 
             services.AddScoped<ITokenServicio, TokenServicio>();
 
+
             services.Configure<ApiBehaviorOptions>(options =>
             {
                 options.InvalidModelStateResponseFactory = actionContext =>
@@ -69,6 +73,10 @@ namespace Api.Extensiones
                 };
 
             });
+
+            services.AddScoped<IUnidadTrabajo, UnidadTrabajo>();
+
+            services.AddAutoMapper(typeof(MappingProfile));
 
             return services;
         }
