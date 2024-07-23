@@ -2,7 +2,7 @@
 
 namespace Data.Interfaces.IRepositorio
 {
-    public interface IMedicoRepositorio
+    public interface IMedicoRepositorio : IRepositorioGenerico<Medico>
     {
         void Actualizar(Medico medico);
     }

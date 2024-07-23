@@ -81,6 +81,7 @@ namespace Api.Extensiones
             services.AddAutoMapper(typeof(MappingProfile));
 
             services.AddScoped<IEspecialidadServicio, EspecialidadServicio>();
+            services.AddScoped<IMedicoServicio, MedicoServicio>();
 
             return services;
         }
