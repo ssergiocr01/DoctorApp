@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Data;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using Models.Entidades;
 using System.Text;
 
 namespace Api.Extensiones
@@ -8,6 +11,12 @@ namespace Api.Extensiones
     {
         public static IServiceCollection AgregarServicioIdentidad(this IServiceCollection services, IConfiguration config)
         {
+
+            services.AddIdentityCore<UsuarioAplicacion>(opt =>
+            {
+                opt.Password.RequireNonAlphanumeric = false;
+            }).AddRoles<RolAplicacion>().AddRoleManager<RoleManager<RolAplicacion>>().AddEntityFrameworkStores<ApplicationDbContext>();
+
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
@@ -20,6 +29,13 @@ namespace Api.Extensiones
                         ValidateAudience = false,
                     };
                 });
+
+            services.AddAuthorization(opt =>
+            {
+                opt.AddPolicy("AdminRol", policy => policy.RequireRole("Admin"));
+                opt.AddPolicy("AdminAgendadorRol", policy => policy.RequireRole("Admin", "Agendador"));
+                opt.AddPolicy("AdminMedicoRol", policy => policy.RequireRole("Admin", "Medico"));
+            });
 
             return services;
         }

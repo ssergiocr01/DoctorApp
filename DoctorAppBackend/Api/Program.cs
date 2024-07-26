@@ -1,5 +1,6 @@
 using Api.Extensiones;
 using Api.Middleware;
+using Data.Inicializador;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,7 +10,7 @@ builder.Services.AddControllers();
 
 builder.Services.AgregarServiciosAplicacion(builder.Configuration);
 builder.Services.AgregarServicioIdentidad(builder.Configuration);
-
+builder.Services.AddScoped<IdbInicializador, DbInicializador>();
 
 var app = builder.Build();
 
@@ -31,6 +32,23 @@ app.UseCors(x => x.AllowAnyOrigin()
 app.UseAuthentication();
 
 app.UseAuthorization();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var loggerFactory = services.GetRequiredService<ILoggerFactory>();
+
+	try
+	{
+		var inicializador = services.GetRequiredService<IdbInicializador>();
+		inicializador.Inicializar();
+	}
+	catch (Exception ex)
+	{
+		var logger = loggerFactory.CreateLogger<Program>();
+		logger.LogError(ex, "Un error ocurrió al ejecutar la migración");
+	}
+}
 
 app.MapControllers();
 

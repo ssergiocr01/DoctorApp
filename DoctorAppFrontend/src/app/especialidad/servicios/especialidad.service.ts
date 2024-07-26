@@ -17,6 +17,10 @@ export class EspecialidadService {
     return this.http.get<ApiResponse>(`${this.baseUrl}`);
   }
 
+  listaActivos():Observable<ApiResponse>{
+    return this.http.get<ApiResponse>(`${this.baseUrl}listadoActivos`);
+  }
+
   crear(request: Especialidad): Observable<ApiResponse> {
     return this.http.post<ApiResponse>(`${this.baseUrl}`, request);
   }
@@ -26,6 +30,6 @@ export class EspecialidadService {
   }
 
   eliminar(id: number): Observable<ApiResponse> {
-    return this.http.delete<ApiResponse>(`${this.baseUrl}${id}`)
+    return this.http.delete<ApiResponse>(`${this.baseUrl}${id}`);
   }
 }

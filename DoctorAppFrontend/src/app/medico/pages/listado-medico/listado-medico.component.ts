@@ -1,49 +1,41 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
-import { Especialidad } from '../../interfaces/especialidad';
+import { Medico } from '../../interfaces/medico';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
-import { EspecialidadService } from '../../servicios/especialidad.service';
+import { MedicoService } from '../../servicios/medico.service';
 import { CompartidoService } from 'src/app/compartido/compartido.service';
 import { MatDialog } from '@angular/material/dialog';
-import { ModalEspecialidadComponent } from '../../modals/modal-especialidad/modal-especialidad.component';
+import { ModalMedicoComponent } from '../../modales/modal-medico/modal-medico.component';
 import Swal from 'sweetalert2';
 
 @Component({
-  selector: 'app-listado-especialidad',
-  templateUrl: './listado-especialidad.component.html',
-  styleUrls: ['./listado-especialidad.component.css'],
+  selector: 'app-listado-medico',
+  templateUrl: './listado-medico.component.html',
+  styleUrls: ['./listado-medico.component.css'],
 })
-export class ListadoEspecialidadComponent implements OnInit, AfterViewInit {
+export class ListadoMedicoComponent implements OnInit, AfterViewInit {
   displayedColumns: string[] = [
+    'apellidos',
+    'nombres',
+    'telefono',
+    'genero',
     'nombreEspecialidad',
-    'descripcion',
     'estado',
     'acciones',
   ];
 
-  dataInicial: Especialidad[] = [];
+  dataInicial: Medico[] = [];
   dataSource = new MatTableDataSource(this.dataInicial);
   @ViewChild(MatPaginator) paginacionTabla!: MatPaginator;
 
   constructor(
-    private _especialidadServicio: EspecialidadService,
+    private _medicoSevicio: MedicoService,
     private _compartidoServicio: CompartidoService,
     private dialog: MatDialog
   ) {}
 
-  nuevaEspecialidad() {
-    this.dialog
-      .open(ModalEspecialidadComponent, { disableClose: true, width: '400px' })
-      .afterClosed()
-      .subscribe((resultado) => {
-        if (resultado === 'true') {
-          this.obtenerEspecialidades();
-        }
-      });
-  }
-
-  obtenerEspecialidades() {
-    this._especialidadServicio.lista().subscribe({
+  obtenerMedicos() {
+    this._medicoSevicio.lista().subscribe({
       next: (data) => {
         if (data.isExitoso) {
           this.dataSource = new MatTableDataSource(data.resultado);
@@ -61,33 +53,39 @@ export class ListadoEspecialidadComponent implements OnInit, AfterViewInit {
     });
   }
 
-  ngOnInit(): void {
-    this.obtenerEspecialidades();
-  }
-
-  ngAfterViewInit(): void {
-    this.dataSource.paginator = this.paginacionTabla;
-  }
-
-  editarEspecialidad(especialidad: Especialidad) {
+  nuevoMedico() {
     this.dialog
-      .open(ModalEspecialidadComponent, {
-        disableClose: true,
-        width: '400px',
-        data: especialidad,
+      .open(ModalMedicoComponent, { 
+        disableClose: true, 
+        width: '600px' 
       })
       .afterClosed()
       .subscribe((resultado) => {
         if (resultado === 'true') {
-          this.obtenerEspecialidades();
+          this.obtenerMedicos();
         }
       });
   }
 
-  removerEspecialidad(especialidad: Especialidad) {
+  editarMedico(medico: Medico) {
+    this.dialog
+      .open(ModalMedicoComponent, {
+        disableClose: true,
+        width: '600px',
+        data: medico,
+      })
+      .afterClosed()
+      .subscribe((resultado) => {
+        if (resultado === 'true') {
+          this.obtenerMedicos();
+        }
+      });
+  }
+
+  removerMedico(medico: Medico) {
     Swal.fire({
-      title: 'Desea Eliminar Especialidad',
-      text: especialidad.nombreEspecialidad,
+      title: 'Desea Eliminar Medico',
+      text: medico.nombres + ' ' + medico.apellidos,
       icon: 'warning',
       confirmButtonColor: '#3085d6',
       confirmButtonText: 'Si, eliminar',
@@ -96,23 +94,23 @@ export class ListadoEspecialidadComponent implements OnInit, AfterViewInit {
       cancelButtonText: 'No',
     }).then((resultado) => {
       if (resultado.isConfirmed) {
-        this._especialidadServicio.eliminar(especialidad.id).subscribe({
+        this._medicoSevicio.eliminar(medico.id).subscribe({
           next: (data) => {
             if (data.isExitoso) {
               this._compartidoServicio.mostrarAlerta(
-                'La especialidad fue eliminada',
+                'El médico fue eliminado',
                 'Completo!'
               );
-              this.obtenerEspecialidades();
+              this.obtenerMedicos();
             } else {
               this._compartidoServicio.mostrarAlerta(
-                'No se puedo eliminar la especialidad',
+                'No se pudo eliminar el médico',
                 'Error!'
               );
             }
           },
           error: (e) => {
-            this._compartidoServicio.mostrarAlerta(e.error.errores, 'Error');
+            this._compartidoServicio.mostrarAlerta(e.error.errores, 'Error!');
           },
         });
       }
@@ -126,5 +124,13 @@ export class ListadoEspecialidadComponent implements OnInit, AfterViewInit {
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
     }
+  }
+
+  ngOnInit(): void {
+    this.obtenerMedicos();
+  }
+
+  ngAfterViewInit(): void {
+    this.dataSource.paginator = this.paginacionTabla;
   }
 }

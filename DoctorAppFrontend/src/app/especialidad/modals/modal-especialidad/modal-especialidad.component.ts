@@ -13,7 +13,7 @@ import { CompartidoService } from 'src/app/compartido/compartido.service';
 export class ModalEspecialidadComponent implements OnInit {
   formEspecialidad: FormGroup;
   titulo: string = 'Agregar';
-  nombreBoton = 'Guardar';
+  nombreBoton: string = 'Guardar';
 
   constructor(
     private modal: MatDialogRef<ModalEspecialidadComponent>,
@@ -90,7 +90,9 @@ export class ModalEspecialidadComponent implements OnInit {
             );
           }
         },
-        error: (e) => {}
+        error: (e) => {
+          this._compartidoServicio.mostrarAlerta(e.error.errores,"Error");
+        }
       });
     }
   }
